@@ -9,24 +9,24 @@ BBL lab members and affiliates work on a number of varied projects and can come 
 It's important to have a template for directory structure; this makes it easy to navigate foreign projects, transfer projects over to others, or simply for your own organizational benefit. Here's the recommended directory structure for BBL projects:
 
 ```
-myproject/					# the project directory; the home of your project
+myproject/							# the project directory; the home of your project
 |
 +-- Notebook_n.ipynb		# your analysis notebooks (.ipynb, .rmd) live in the project directory
 |
-+--	scripts					# any scripts you write to automate large processes go in the scripts directory
++--	scripts							# any scripts you write to automate large processes go in the scripts directory
 |	|
 |	+-- script1.sh
 |	|
 |	+-- script2.py
 |
-+-- data					# any data sources you work with for the project, such as .csv
-|	|						# files, .dicom files, etc. that you read into your project notebook(s)
++-- data								# any data sources you work with for the project, such as .csv
+|	|											# files, .dicom files, etc. that you read into your project notebook(s)
 |	+-- participants.csv	# go into the data directory
 |
-+-- results					# the results directory contains any useful results outputs
-	|						# from your notebooks or scripts, such as long .csv's, plots,
++-- results							# the results directory contains any useful results outputs
+	|											# from your notebooks or scripts, such as long .csv's, plots,
 	+--	scan_results.csv	# or images that are too verbose for a notebok; ideally, you might
-	|						# create a new notebook where you comment on and analyze your results
+	|											# create a new notebook where you comment on and analyze your results
 	+-- scan_plot.png
 ```
 
@@ -42,13 +42,13 @@ It's appropriate to create subdirectories within the 3 main directories `scripts
   |
   +-- data
       |
-      +-- demographics 					# a demographics directory for all the demographics info
+      +-- demographics 							# a demographics directory for all the demographics info
       |	  |
       |	  +-- participant_ids.json
       |	  :
       |   +-- contact_info.json
       |
-      +-- scans 						# a scans directory for dicoms
+      +-- scans 										# a scans directory for dicoms
       	  |
       	  +-- p1_scan_01.dicom
       	  +-- p1_scan_02.dicom
@@ -63,9 +63,9 @@ Version control allows us to go back to different versions of a file. This is di
 ```
 myproject/					
 |
-+-- Struct_analysis.ipynb				# the first analysis
++-- Struct_analysis.ipynb						# the first analysis
 |
-+-- Struct_analysis_GAM.ipynb			# the same analysis but using a GAM instead of GLM
++-- Struct_analysis_GAM.ipynb				# the same analysis but using a GAM instead of GLM
 |
 +-- Struct_analysis_GAM_20181008.ipynb	# the same analysis but modified on today's date
 |
@@ -132,9 +132,9 @@ Now that we've covered how to structure your project directory and how to ignore
 It's recommended to initialize your repository in your projects folder, like so:
 
 ```
-myproject/					# the project directory; initialize git here so as to capture 
-|							# everything that happens with your project in version control,
-+-- Notebook_n.ipynb		# but also create .gitignore here, hiding 'data' and 'results'
+myproject/									# the project directory; initialize git here so as to capture 
+|														# everything that happens with your project in version control,
++-- Notebook_n.ipynb				# but also create .gitignore here, hiding 'data' and 'results'
 +--	scripts/				
 +-- data/
 +-- results/
@@ -146,4 +146,4 @@ See [this tutorial](https://www.atlassian.com/git/tutorials/setting-up-a-reposit
 
 This tutorial covered recommended directory structure in BBL, including why it's important to have a uniform directory structure across projects and why we use notebooks. We also covered a little bit of git and how to organize your directories with git, including how to use the `.gitignore` file to hide sensitive data from public repositories.
 
-Here is a .gitignore template with common filetypes we want to ignore in BBL: [template]()
+Here is a .gitignore template with common filetypes we want to ignore in BBL: [template](./.gitignore)
