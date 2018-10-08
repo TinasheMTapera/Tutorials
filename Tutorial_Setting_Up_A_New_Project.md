@@ -61,11 +61,11 @@ It's appropriate to create subdirectories within the 3 main directories `scripts
 Version control allows us to go back to different versions of a file. This is different, however, from different analyses. Including a data transformation or using different data source is changing the analysis, not the version of it, and so it may be useful to create a new analysis notebook. In JuPyteR and R notebooks, simply duplicate the old notebook at the project directory level, and rename the notebook with an updated date or added change. In your notebook's first text block/cell, make a comment that this analysis carries on from a previous notebook.
 
 ```
-myproject/					
+myproject/
 |
-+-- Struct_analysis.ipynb						# the first analysis
++-- Struct_analysis.ipynb								# the first analysis
 |
-+-- Struct_analysis_GAM.ipynb				# the same analysis but using a GAM instead of GLM
++-- Struct_analysis_GAM.ipynb						# the same analysis but using a GAM instead of GLM
 |
 +-- Struct_analysis_GAM_20181008.ipynb	# the same analysis but modified on today's date
 |
