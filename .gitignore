@@ -4,3 +4,5 @@
 
 data/       # to ignore your data folder
 results/    # to ignore your results folder
+fwheudiconv-demo-data/
+*.tsv
