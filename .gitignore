@@ -13,3 +13,5 @@ fwheudiconv-demo-data/
 
 XNAT Intro.ipynb
 .ipynb_checkpoints/
+_pycache_
+\.~lock*
