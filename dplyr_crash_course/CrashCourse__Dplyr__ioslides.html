@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CrashCourse::Dplyr</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Tinashe M. Tapera" />
+    <link href="CrashCourse__Dplyr__ioslides_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="CrashCourse__Dplyr__ioslides_files/remark-css-0.0.1/hygge.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# CrashCourse::Dplyr
+### Tinashe M. Tapera
+
+---
+
+
+## Agenda
+
+.pull-left[1. The Philosophy
+2. The Basics
+3. The Extras]
+
+---
+
+## The Philosophy
+
+"`dplyr` is a grammar of data manipulation, providing a consistent set of **verbs** that help you solve the most common data manipulation challenges."
+
+&lt;div style='text-align: right;'&gt; — https://dplyr.tidyverse.org/ &lt;/div&gt;
+&lt;br&gt;
+
+.pull-left[
+- If `R` is a language, `dplyr` is a dialect
+- Main focus on data munging within the R ecosystem:
+    - You're gonna wanna use `tibble()`s
+- Focuses on elegance, readability, parsimony, and reproducibility
+- Part of the `tidyverse`, so works well with all of their packages
+]
+.pull-right[
+&lt;img src="./DIGWydkXUAAbWs2.jpg" height=300&gt;
+]
+
+
+---
+
+## The Philosophy
+
+- `dplyr` abstracts base R; does not replace direct knowledge
+- Not very widely scoped; wouldn't use it for out-of-`tibble()` situations (but many situations in R can be manipulated into `tibble()`-friendly ones)
+- Elegant, but not the fastest; with very large datasets, `data.table` is faster ([source](https://github.com/Rdatatable/data.table/wiki/Benchmarks-%3A-Grouping))
+
+---
+
+## The Basics
+
+*"I claim that most single table problems can be solved with just five key verbs: filter, select, mutate, arrange and summarise, along with a 'by group' adverb."*
+
+.pull-right[— [Hadley Wickham](https://stackoverflow.com/questions/21435339/data-table-vs-dplyr-can-one-do-something-well-the-other-cant-or-does-poorly/27840349#27840349)]
+---
+
+## The Basics | `%&gt;%`
+**Pipes** conjoin each `dplyr` verb by saying "and then...".
+
+
+```r
+library(dplyr, warn.conflicts = FALSE, quietly = TRUE)
+
+iris %&gt;%
+  head() #note the indentation for readability
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa
+```
+
+---
+
+## The Basics | `%&gt;%`
+
+- Typically, you could just do `head(iris)`: parsimonious &amp; readable!
+- What if you had 3, 4, or more functions wrapping around one object?
+
+e.g. what are the coefficients of a linear model predicting Species in iris, using only rows where Sepal.Length is greater than the mean Sepal Length?
+
+
+```r
+coef(lm(Species ~., data=subset(iris, iris$Sepal.Length &gt; mean(iris$Sepal.Length))))
+```
+
+```
+##  (Intercept) Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+##    0.4760524   -0.2514633   -0.2395932    0.4583072    0.6171173
+```
+
+- Some programmers suggest breaking up their compound lines by assigning outputs to variables incrementally, e.g.
+
+
+```r
+meanSepal = mean(iris$Sepal.Length)
+subsdf = subset(iris, iris$Sepal.Length &gt; meanSepal)
+# etc...
+```
+
+- Really, tho...?
+---
+
+## The Basics | `%&gt;%`
+
+In dplyr, it looks like this:
+
+
+```r
+iris%&gt;%                                           # the noun
+  filter(Sepal.Length &gt; mean(Sepal.Length))%&gt;%    # first verb
+  lm(Species ~ ., data=.)%&gt;%                      # second verb
+  coef()                                          # last verb
+```
+
+```
+##  (Intercept) Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+##    0.4760524   -0.2514633   -0.2395932    0.4583072    0.6171173
+```
+
+---
+
+## The Basics | `.`
+
+- Formulas in R can make use of a period or dot operator: `lm(Species ~ ., data=iris)`. The dot refers to "all variables except those on the LHS/RHS". 
+- In `dplyr` (really, `magrittr`), the dot refers to the noun being passed around, and is implicit by default.
+- It is described as a "dummy parameter" or "placeholder"
+
+
+```r
+iris%&gt;%                     # iris%&gt;%
+  head(2)                   #   head(x=.,n=2)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+```
+- There are some nuances to its use that will come up as you get into more advanced operations
+---
+
+## The Basics | `select()`
+
+- Most important verb to understand
+- For selecting columns or variables (as long as object is a kind of dataframe)
+
+
+```r
+iris%&gt;%
+  select(Sepal.Length, Petal.Length)%&gt;%
+  head(3)
+```
+
+```
+##   Sepal.Length Petal.Length
+## 1          5.1          1.4
+## 2          4.9          1.4
+## 3          4.7          1.3
+```
+
+- Compare with bracket `[,]` indexing:
+
+
+```r
+head( iris[, grep("Length$", names(iris))], 3)
+```
+
+```
+##   Sepal.Length Petal.Length
+## 1          5.1          1.4
+## 2          4.9          1.4
+## 3          4.7          1.3
+```
+---
+
+## The Basics | `select()`
+
+So many helper functions with `select()`!!!
+
+- `-` to drop, `Var1:Var5` for a range, `c(...)` for vectors
+- `starts_with()`, `ends_with()`, `contains()`, `matches("regular_expression")` for regular expressions
+- `one_of(c(...))` for optional matching
+- `everything()` for everything that's left
+
+
+```r
+iris %&gt;% 
+  select(ends_with("Length")) %&gt;%
+  head(3)
+```
+
+```
+##   Sepal.Length Petal.Length
+## 1          5.1          1.4
+## 2          4.9          1.4
+## 3          4.7          1.3
+```
+
+---
+
+## The Basics | `filter()`
+
+- For selecting rows of a dataframe
+
+
+```r
+iris%&gt;%
+  filter(Species == "setosa")%&gt;%
+  head(3)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+```
+
+- Compare with `which()`
+
+
+```r
+head( iris[which(iris$Species == "setosa"), ] ,3)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+```
+---
+
+## The Basics | `mutate()`
+
+- Use `mutate()` to add new columns onto the dataframe (and use `transmute()` to only return the new column)
+- Implicitly calls `select()`
+
+
+```r
+iris %&gt;%
+  mutate(Sepal.Area = Sepal.Length*Sepal.Width) %&gt;%
+  head(3)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species Sepal.Area
+## 1          5.1         3.5          1.4         0.2  setosa      17.85
+## 2          4.9         3.0          1.4         0.2  setosa      14.70
+## 3          4.7         3.2          1.3         0.2  setosa      15.04
+```
+---
+
+## The Basics | `arrange()`
+
+- Sort by variable(s)
+
+
+```r
+iris %&gt;%
+  arrange(-Sepal.Length, -Sepal.Width) %&gt;%
+  head(3)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+## 1          7.9         3.8          6.4         2.0 virginica
+## 2          7.7         3.8          6.7         2.2 virginica
+## 3          7.7         3.0          6.1         2.3 virginica
+```
+
+- Also respects grouping variables, too!
+---
+
+## The Basics | `summarise()`
+
+- Takes a range of rows and applies some function to return a dataframe of one value:
+
+
+```r
+iris %&gt;%
+  summarise(my_mean=mean(Petal.Length))
+```
+
+```
+##   my_mean
+## 1   3.758
+```
+
+---
+
+## The Basics | `group_by()`
+
+- Applies a grouping arrangement to be passed on to other functions further on
+- All basic functions in `dplyr` respect grouping
+
+
+```r
+iris %&gt;%
+  group_by(Species) %&gt;%
+  summarise(my_mean=mean(Petal.Length))
+```
+
+```
+## # A tibble: 3 x 2
+##   Species    my_mean
+##   &lt;fct&gt;        &lt;dbl&gt;
+## 1 setosa        1.46
+## 2 versicolor    4.26
+## 3 virginica     5.55
+```
+
+- You can group by as many variables as you'd like
+
+---
+
+## The Basics | `gather()`
+
+- `gather()` is great for turning wide-form data into long-form. Args as follows:
+```
+gather(key = name the variable stack,
+        value = name the values,
+        ... = which variables to gather (use select() helpers))
+```
+
+```r
+library(tidyr)
+iris %&gt;%
+  gather(Petal_metric, value, starts_with("Petal")) %&gt;%
+  head(10)
+```
+
+```
+##    Sepal.Length Sepal.Width Species Petal_metric value
+## 1           5.1         3.5  setosa Petal.Length   1.4
+## 2           4.9         3.0  setosa Petal.Length   1.4
+## 3           4.7         3.2  setosa Petal.Length   1.3
+## 4           4.6         3.1  setosa Petal.Length   1.5
+## 5           5.0         3.6  setosa Petal.Length   1.4
+## 6           5.4         3.9  setosa Petal.Length   1.7
+## 7           4.6         3.4  setosa Petal.Length   1.4
+## 8           5.0         3.4  setosa Petal.Length   1.5
+## 9           4.4         2.9  setosa Petal.Length   1.4
+## 10          4.9         3.1  setosa Petal.Length   1.5
+```
+
+---
+
+## The Basics | `spread()`
+
+- The complement to `gather()`
+```
+spread(key = the variable to unstack,
+        value = the variable with your stacked values)
+```
+
+```r
+library(tibble)
+iris %&gt;%
+  rownames_to_column("index") %&gt;%                         # ?!?!
+  gather(Petal_metric, value, starts_with("Petal")) %&gt;%
+  spread(Petal_metric, value) %&gt;%
+  arrange(as.numeric(index)) %&gt;%                          # ?!?!
+  head(5)
+```
+
+```
+##   index Sepal.Length Sepal.Width Species Petal.Length Petal.Width
+## 1     1          5.1         3.5  setosa          1.4         0.2
+## 2     2          4.9         3.0  setosa          1.4         0.2
+## 3     3          4.7         3.2  setosa          1.3         0.2
+## 4     4          4.6         3.1  setosa          1.5         0.2
+## 5     5          5.0         3.6  setosa          1.4         0.2
+```
+
+- ?!?! One quirk: `spread()` needs specific row indeces to unravel its values; throw in an explicit column index and order 
+---
+
+## The Basics | Other Common Functions
+
+- `separate()`/`unite()`
+  - Complementary string column "split" and "concatenate"
+
+- `*_join()`
+  - Traditional SQL-style joins (but with a nicer interface than `merge()`,`sqldf`, etc.)
+
+- `sample_n()`/`sample_frac()`
+  - Sampling rows of a dataframe (with or without replacement)
+  - Much clearer than `iris[ sample(nrow(iris), n), ]`
+
+- `slice()`
+  - Positional row indexing
+
+- Remember to `ungroup()` explicitly!
+- Remember to use `rowwise()` to iterate (like calling `apply(MARGIN=2)`), because [R does not like iterating rows naturally](https://milesmcbain.xyz/rstats-anti-pattern-row-wise/); it's vectorised!
+
+---
+
+## The Extras | list-columns
+
+- You can `nest()` dataframes and lists in `dplyr` to create list-columns
+
+
+```r
+iris%&gt;%
+  nest(-Species)%&gt;%
+  as_tibble()             # for viewing on this slide
+```
+
+```
+## # A tibble: 3 x 2
+##   Species    data                 
+##   &lt;fct&gt;      &lt;list&gt;               
+## 1 setosa     &lt;data.frame [50 × 4]&gt;
+## 2 versicolor &lt;data.frame [50 × 4]&gt;
+## 3 virginica  &lt;data.frame [50 × 4]&gt;
+```
+
+- You can then map operations on the list's objects with the `purrr` package (that's a topic for another day, though)
+
+---
+
+## The Extras | list-columns
+
+- Remember `summarise()`? It only works if the return of the summary gives you a single value vector. Using list-columns can help us override this
+- What are the quantiles of `Sepal.Length` for each species of iris?
+
+
+```r
+#base R, you'd have to call this three times for each species
+quantile( iris[which(iris$Species == "setosa"), "Sepal.Length"] )
+```
+
+```
+##   0%  25%  50%  75% 100% 
+##  4.3  4.8  5.0  5.2  5.8
+```
+
+
+```r
+#dplyr without list-columns returns an error
+
+iris %&gt;%
+  group_by(Species) %&gt;%
+  summarise(quant=quantile(Sepal.Length))
+```
+
+```
+## Error in summarise_impl(.data, dots): Column `quant` must be length 1 (a summary value), not 5
+```
+
+---
+
+## The Extras | list-columns
+
+
+```r
+# instead, just coerce the return value into a list-column
+iris %&gt;%
+  group_by(Species) %&gt;%
+  summarise(Sepal_Length_quants = list(quantile(Sepal.Length)))
+```
+
+```
+## # A tibble: 3 x 2
+##   Species    Sepal_Length_quants
+##   &lt;fct&gt;      &lt;list&gt;             
+## 1 setosa     &lt;dbl [5]&gt;          
+## 2 versicolor &lt;dbl [5]&gt;          
+## 3 virginica  &lt;dbl [5]&gt;
+```
+
+---
+
+## The Extras | list-columns
+
+
+```r
+iris %&gt;%
+  group_by(Species) %&gt;%
+  summarise(Sepal_Length_quants = list(quantile(Sepal.Length))) %&gt;%
+  .$Sepal_Length_quants
+```
+
+```
+## [[1]]
+##   0%  25%  50%  75% 100% 
+##  4.3  4.8  5.0  5.2  5.8 
+## 
+## [[2]]
+##   0%  25%  50%  75% 100% 
+##  4.9  5.6  5.9  6.3  7.0 
+## 
+## [[3]]
+##    0%   25%   50%   75%  100% 
+## 4.900 6.225 6.500 6.900 7.900
+```
+
+---
+
+## The Extras | Scoped `filter_*()`
+
+- You can create complex filtering conditions using scoped filters like `filter_at()`, `filter_all()`, and `filter_if()`
+- These will return the rows of a dataframe once filtered on the specific variable predicates
+
+e.g. let's filter only length variables from iris, where the length is greater than 5 for either of them
+
+
+```r
+iris %&gt;%
+  filter_at(.vars = vars(contains("Length")),
+            .vars_predicate = any_vars(. &gt; 5)) %&gt;%
+  head(3)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          5.4         3.9          1.7         0.4  setosa
+## 3          5.4         3.7          1.5         0.2  setosa
+```
+
+- Note the use of `vars()`, which explicitly calls `select()` helpers
+
+---
+
+## The Extras | Scoped `mutate_*()`
+
+- Similarly, there are scoped mutate and summarise calls
+
+e.g. multiply only numeric variables by 2
+
+
+```r
+iris %&gt;%
+  transmute_if(is.numeric, 
+               funs(new = . * 2)) %&gt;%
+  head(3)
+```
+
+```
+##   Sepal.Length_new Sepal.Width_new Petal.Length_new Petal.Width_new
+## 1             10.2             7.0              2.8             0.4
+## 2              9.8             6.0              2.8             0.4
+## 3              9.4             6.4              2.6             0.4
+```
+
+---
+
+## The Extras | Scoped `summarise_*()`
+
+e.g. Let's summarise only width variables to get their means
+
+
+```r
+# admittedly, this is overcomplicated
+iris %&gt;%
+  summarise_at(vars(ends_with("width")), 
+               funs(mean)) %&gt;%
+  head(3)
+```
+
+```
+##   Sepal.Width Petal.Width
+## 1    3.057333    1.199333
+```
+- Note the use of `funs()`, which can accept any number of custom functions
+---
+## Conclusion
+
+- `dplyr` makes data munging cleaner and more interpretable
+- There are lots of useful hidden functions under the hood
+- Doesn't replace knowledge of base R
+- Doesn't scale to HPC scenarios; best for making table summarisations and operations easier
+- Huge community support means that you can figure out pretty much anything eventually
+---
+class: center, inverse
+.center[# Thank you!]
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
