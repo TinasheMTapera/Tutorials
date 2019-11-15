@@ -1,3 +1,11 @@
+# a template gitignore file
+# add this to your git repository BEFORE
+# you clone it to a public forum (eg github)
+
+data/       # to ignore your data folder
+results/    # to ignore your results folder
+fwheudiconv-demo-data/
+*.tsv
 .Rproj.user
 .Rhistory
 .RData
@@ -5,3 +13,5 @@
 
 XNAT Intro.ipynb
 .ipynb_checkpoints/
+_pycache_
+\.~lock*
