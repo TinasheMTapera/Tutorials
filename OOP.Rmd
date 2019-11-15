@@ -1,0 +1,53 @@
+---
+title: "Object Oriented Programming in R and Python"
+output: html_document
+---
+
+# Introduction
+
+In most of statistical programming, scientists work with *numerical* and *text* data. These are useful for accomplishing typical data analysis tasks, but this is not how programming itself was designed.
+
+Programming languages in general, are designed to give their users the ability to instruct the computer to execute any command they can think of -- not just those in the documentation. You *technically could* design an entire web server, building a self-driving car, or communicate with a satellite, all from within R. But none of these tasks are within R's strengths, and that's why other languages exist.
+
+In general though, most mid- to low-level programming languages give you the ability to accomplish a myriad of tasks by leveraging **Object Oriented Programming**.
+
+> Object-oriented programming (OOP) refers to a type of computer programming (software design) in which programmers define the data type of a data structure, and also the types of operations (functions) that can be applied to the data structure.
+
+Instead of being confined to primitive datatypes -- strings, numeric, vectors, matrices, etc. --  OOP allows you as a programmer to wrap up and combine these data structures into something that works more specifically for your desired application.
+
+# Why Should I Care?
+
+If you've been getting along fine all this time without OOP, why should you care about this tutorial?
+
+The simplest advantage is that OOP gives you the ability to be far more creative in solving problems. Not only will you learn how to create your own data structures for your specific use cases, you will also learn how *others* have created their data structures and the possibilities/limitations they place in their paradigms, meaning you'll be able to use their software more effectively.
+
+If anything, this will hopefully be useful computer science knowledge in your back pocket that you can implement in your own science if you ever need to.
+
+# Disclaimer
+
+I'm not an expert in OOP; this only applies to the two languages I have solid experience in. OOP in other languages sometimes works quite differently, but since I work with scientists, these are the approaches I've found to be useful for scientific programming.
+
+# OOP Theory
+
+## Classes
+
+> A reusable collection of data and behaviour
+
+Classes are programmers' conceptualisations of real things -- a blueprint, if you will. Instead of being forced to represent a person as a row of data on a table with columns representing attributes, you could represent them as a datatype called `person`.
+
+A programmer can create an `instance` of a `person`, by saying that a person is an object (whoops) with a **name**, and an **age**.
+
+What's interesting is that these pieces of data, in OOP called `attributes`, are themselves primitive datatypes, `string` and `numeric`.
+
+Additionally, the programmer can define a finite set of actions that a `person` can do, such as `introduce` themselves, or `catch` a ball. These actions are called `methods`.
+
+You could imagine that every instance of `person` has unique attributes for `name` and `age`, but surely every `person` should have the same species? In that case, you can define your class `person` to ALWAYS have the same species by setting it as a *class attribute*.
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
+
