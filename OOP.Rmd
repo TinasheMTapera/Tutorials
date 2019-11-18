@@ -29,9 +29,7 @@ I'm not an expert in OOP; this only applies to the two languages I have solid ex
 
 # OOP Theory
 
-## Classes
-
-> A reusable collection of data and behaviour
+> Classes: A reusable collection of data and behaviour
 
 Classes are programmers' conceptualisations of real things -- a blueprint, if you will. Instead of being forced to represent a person as a row of data on a table with columns representing attributes, you could represent them as a datatype called `person`.
 
@@ -43,11 +41,285 @@ Additionally, the programmer can define a finite set of actions that a `person` 
 
 You could imagine that every instance of `person` has unique attributes for `name` and `age`, but surely every `person` should have the same species? In that case, you can define your class `person` to ALWAYS have the same species by setting it as a *class attribute*.
 
+What's interesting, is that classes in OOP can *inherit* from one another, meaning that you could create two subclasses `male` and `female`, derived from the `person` class. The only difference being that the `male` and `female` classes have the `sex` attribute. We call `person` the 
+
+---
+
+### tl;dr --> Classes are blueprints for datatypes; they have attributes, that describe *what they are*, and methods, that describe *what they do*.
+
+---
+
+# OOP Example 1: Python
+
+The best way to learn OOP is through a language like `Python`. It implements the most intuitive OOP paradigm and its usefulness scales with practice very smoothly. For now, we will simply demonstrate the above in `Python` before demonstrating it in `R`.
+
+Note that this is an RMarkdown document, so we use the `reticulate` package to give us a Python engine for RMarkdown; basically, you can call python in RStudio in your RMarkdown document by changing the chunk engine from `{r}` to `{python}`:
+
 ```{r}
-plot(cars)
+library(reticulate)
+use_python("/usr/bin/python3")
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+```{python}
+import sys
+print(sys.version)
+print("hello from python")
+```
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
+## How do you define a class?
 
+First, you need to have a special python function called an *initialiser*. This function tells the class **how to set itself up**:
+
+```{python}
+class Person:
+    
+    # Initializer to create Attributes
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+```
+
+Don't get tripped up by the `self` keywords; they are basically there to tell your new object that this is a function that is self-referential. Additionally, the underscores simply help python to reserve this function and not confuse it with others written outside of the class.
+
+Now that we have the initialiser, we can create a new instance of `Person`!
+
+```{python}
+# define a person
+class Person:
+    
+    # Initializer to create Attributes
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+# instantiate a person
+tinashe = Person("Tinashe", 25)
+
+# introduce myself
+print("My name is ", tinashe.name, " and I'm ", tinashe.age)
+```
+
+```{python}
+### Use this space to define and create a `Person` object of yourself!
+### Additionally, in your class definition, add an attribute for your favourite colour (a string variable)
+```
+
+Notice that we use the `.` to access the attributes of the new `Person` object. You see this a lot in python code because many developers use OOP to create objects for all sorts of applications. To list the attributes of an object, you can use the function `dir()`:
+
+```{python}
+# define a person
+class Person:
+    
+    # Initializer to create Attributes
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+# instantiate a person
+tinashe = Person("Tinashe", 25)
+
+# what is a person object made of?
+print(dir(tinashe))
+```
+
+## Giving a Class Methods
+
+We can make this class do specific things by giving it methods. Let's get a person to `introduce` themselves:
+
+```{python}
+
+# define a person
+class Person:
+    
+    # Initializer to create Attributes
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        
+    def introduce(self):
+        return "My name is {} and I'm {} years old".format(self.name, self.age)
+
+# instantiate a person
+tinashe = Person("Tinashe", 25)
+
+print(tinashe.introduce())
+        
+```
+
+Again, note the use of `self`. By defining the function in the class with `self` as the first argument, it allows the function to access and manipulate the attributes of the object. We can create functions that do that to our `person`:
+
+```{python}
+
+# define a person
+class Person:
+    
+    # Initializer to create Attributes
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        self.hair = None
+        
+    def introduce(self):
+        if self.hair is None:
+            return "My name is {} and I'm {} years old".format(self.name, self.age)
+        else:
+            return "My name is {}, I'm {} years old, and my hair colour is {}".format(self.name, self.age, self.hair)
+
+    def set_hair_colour(self, colour):
+        self.hair = colour
+
+# instantiate a person
+tinashe = Person("Tinashe", 25)
+
+# before we set hair colour
+print tinashe.introduce()
+
+# after we set hair colour
+tinashe.set_hair_colour("Black")
+print(tinashe.introduce())
+```
+
+Pretty cool!
+
+```{python}
+### Use this space to create a person class with a method to tell you how old they'll be in x years.
+### Hint: use `def` and don't forget to use `self`
+
+### def future_age(self, x):
+###     current_age = self.age
+###     ...
+###     ...
+###     ...
+```
+
+
+## Class inheritance
+
+An important understanding for OOP is class inheritance. Just as a `student` is a type of `Person`, classes in python can be subclasses of other classes. Let's create a student:
+
+```{python, eval = FALSE}
+
+# define a person
+class Person:
+
+    # Initializer to create Attributes
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        self.hair = None
+
+    def introduce(self):
+        if self.hair is None:
+            return "My name is {} and I'm {} years old".format(self.name, self.age)
+        else:
+            return "My name is {}, I'm {} years old, and my hair colour is {}".format(self.name, self.age, self.hair)
+
+    def set_hair_colour(self, colour):
+        self.hair = colour
+
+# define a student
+class Student(Person):
+
+
+    # we need to instantiate it similarly to the person
+    def __init__(self, name, age, field):
+        self.field = field
+        super().__init__(name, age)      # this is a special way of saying "do everything else for the parent class as normal"
+
+    def field_of_study(self):
+        return "I study {}".format(self.field)
+
+# instantiate a student, using the same arguments as Person
+tinashe = Student("Tinashe", 25, "neuroscience")
+
+print(tinashe.introduce())
+print(tinashe.field_of_study())
+```
+
+Hopefully this gives you a grand idea of what OOP is and how it works. Developers use OOP to implement real-world ideas in programming languages. With the correct blueprint and enough cleverness, you could model the diffusion of point particles, a taxonomy of animals, products in a supply chain, etc. etc.
+
+### tl;dr --> We learned how to create classes in Python, by creating objects with attributes, and methods that we can use to access/manipulate these attributes; we also learned how to create a subclass!
+
+---
+
+# OOP Example 2: R
+
+We start with Python because it's the most intuitive and user friendly for OOP insofar as understanding *what it is*. In R, this is somewhat clunkier and opaque -- with good reason! Most of us in R only care about dataframes and the values in their cells.
+
+What you may not realise is that R has a lot of class programming going on. A `tibble`, for example, is a subclass of `data.frame`, meaning that everything a `data.frame` can do, a `tibble` can do as well. The reason a `tibble` prints differently from a `data.frame` is that the clever folks at RStudio used OOP to **override** the print method of a `data.frame` and make it prettier. 
+
+```{r}
+print(iris)
+print(tibble::as_tibble(iris))
+```
+
+Understanding how these OOP principles work in any language is valuable for solving programming problems -- both in creating your own classes and using others' classes. In R, developers use OOP to take advantages of **polymorphism** and **encapsulation**:
+
+> Polymorphism means that a developer can consider a function’s interface separately from its implementation, making it possible to use the same function form for different types of input. This is closely related to the idea of encapsulation: the user doesn’t need to worry about details of an object because they are encapsulated behind a standard interface.
+
+To be concrete, polymorphism is what allows summary() to produce different outputs for numeric and factor variables:
+
+```{r}
+
+diamonds <- ggplot2::diamonds
+
+summary(diamonds$carat)
+summary(diamonds$cut)
+```
+
+What's happening is that the class of the `diamonds$carat` vector is defined differently from the `diamonds$cut` vector. Calling `summary` on these produces different results because `summary` looks at the class of the object it's being called on first, and then *dispatches* the correct method for that class. That's why you sometimes see, in documentation:
+
+```
+summary
+summary.aov
+summary.glm
+summary.lm
+etc.
+```
+`summary` is the interface for a function that acts differently depending on the class. Let's learn how to create classes in R and override the summary function accordingly. In R, we call these functions `generics` and these perform the job of
+
+## Simple OOP: S3
+
+**S3** refers to the OOP paradigm first designed for S, version 3 [see WhyDoesR](https://twitter.com/whydoesr). It comes in Base and is very simple/flexible. It's not nearly as strict as the python paradigm -- all you have to do is set the `class` attribute:
+
+```{r}
+# first, create a named vector
+tinashe <- c("Tinashe", 25)
+names(tinashe) <- c("Name", "Age")
+
+#set the class attribute
+class(tinashe) <- "Person"
+
+tinashe
+```
+
+That's it!
+
+In practice though, for S3, you should try to emulate the behaviours we practiced in Python for safety:
+
+```{r}
+# a constructor; in python we called this the initialiser in the class blueprint
+
+new_Person <- function(name, age){
+  
+  if(typeof(name) != "character") {
+    stop("Name must be a character vector")
+  }
+  
+  if(typeof(age) != "double") {
+    stop("Age must be a numeric")
+  }
+  
+  person <- c(name, age)
+  names(person) <- c("name", "age")
+  
+  class(person) <- "Person"
+  
+  person
+
+}
+```
+
+## Method Dispatch
+
+A bit confusingly (WhyDoesR?!), in order to define a method for a class, you need to understand method dispatch. Method dispatch is a type of strategy for passing a class around until it finds the right method. E.g., `summary()` dispatches the class to the correct method depending on the object it has to summarise. 
