@@ -68,15 +68,15 @@ print("hello from python")
 
 ## How do you define a class?
 
-First, you need to have a special python function called an *initialiser*. This function tells the class **how to set itself up**:
+First, you need to have a special python function called `__init__`, for *initialiser*. This function tells the class **how to set itself up**:
 
 ```{python}
 class Person:
-    
-    # Initializer to create Attributes
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
+
+  # Initializer with Attributes being created
+  def __init__(self, name, age):
+      self.name = name
+      self.age = age
 ```
 
 Don't get tripped up by the `self` keywords; they are basically there to tell your new object that this is a function that is self-referential. Additionally, the underscores simply help python to reserve this function and not confuse it with others written outside of the class.
@@ -354,6 +354,12 @@ print.Person <- function(x){
 
 ```{r}
 print(tinashe)
+```
+
+```{r}
+print("Try for yourself!")
+
+### override the summary() generic for the Person class to print something interesting
 ```
 
 To get the methods for a datatype, just use `methods()`:
