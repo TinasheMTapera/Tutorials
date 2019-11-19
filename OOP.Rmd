@@ -57,7 +57,7 @@ Note that this is an RMarkdown document, so we use the `reticulate` package to g
 
 ```{r}
 library(reticulate)
-use_python("/usr/bin/python3")
+use_python("/Users/mac/opt/miniconda3/bin/python")
 ```
 
 ```{python}
@@ -100,6 +100,7 @@ print("My name is ", tinashe.name, " and I'm ", tinashe.age)
 ```
 
 ```{python}
+print("Try for yourself!")
 ### Use this space to define and create a `Person` object of yourself!
 ### Additionally, in your class definition, add an attribute for your favourite colour (a string variable)
 ```
@@ -182,6 +183,7 @@ print(tinashe.introduce())
 Pretty cool!
 
 ```{python}
+print("Try for yourself!")
 ### Use this space to create a person class with a method to tell you how old they'll be in x years.
 ### Hint: use `def` and don't forget to use `self`
 
@@ -322,4 +324,56 @@ new_Person <- function(name, age){
 
 ## Method Dispatch
 
-A bit confusingly (WhyDoesR?!), in order to define a method for a class, you need to understand method dispatch. Method dispatch is a type of strategy for passing a class around until it finds the right method. E.g., `summary()` dispatches the class to the correct method depending on the object it has to summarise. 
+A bit confusingly (WhyDoesR?!), in order to define a method for a class, you need to understand method dispatch. Method dispatch is a type of strategy for passing a class around until it finds the right method. E.g., `summary()` dispatches the class to the correct method depending on the object it has to summarise. In order to do this ourselves, we need to first understand what a `generic` is:
+
+```{r}
+print
+```
+
+A generic is a method that can dispatch to other, more specific methods, hence the name.
+
+`UseMethod` is a reserved function in R that instructs the interpreter to a method dispatch strategy, i.e. you go and find the right version of print.
+
+```{r}
+print.data.frame
+```
+
+```{r}
+print.Date
+```
+
+Finally, let's write a method for our person class in R. All you have to do in S3 is define it using the `.` notation, and R will dispatch to this method:
+
+```{r}
+print.Person <- function(x){
+  
+  cat(glue::glue("My name is {x['Name']} and I am {x['Age']} years old."))
+  
+}
+```
+
+```{r}
+print(tinashe)
+```
+
+To get the methods for a datatype, just use `methods()`:
+
+```{r}
+methods(class = 'data.frame')
+```
+
+In general, however, S3 is a very simple OOP paradigm meaning that it can be very unstable. It would be easy to overwrite, e.g. `lm` for another datatype. If someone were to reuse your code, `lm` may have some unexpected side effects that couldn't be warned for or handled safely.
+
+## Advanced OOP: S4, RC, R6...
+
+S4 is a more formal and stable OOP paradigm in R. Being more formal prevents developers from making unsafe overrides and creating unintended side effects, but also requires a large investment of time and effort. Additionally, it can dispatch methods in more complicated ways. If you've ever found yourself inspecting a variable like this: `variable@bit1`, you're using S4.
+
+RC implements OOP by making sure that objects are *passed by reference*; this lowers in-memory overhead since in R, [everything is a copy](https://www.oreilly.com/library/view/r-in-a/9781449358204/ch05s05.html).
+
+R6 is similar to RC, and again, more formal, but it's also much less popular, so it's not as well documented.
+
+# Take Home Message
+
+OOP is important for programmers to know because it allows you to better investigate, understand, and manipulate other people's packages. It gives you basic "under-the-hood" knowledge of how the program *could* work, so that if you ever come across something undocumented or there's no examples on stack overflow, you can dig into these objects with more confidence. If you have a basic grasp of OOP, you're less likely to panic when someone shows you a Python script vs a Java script; they all have these concepts baked in.
+
+Furthermore, knowing OOP gives you a richness of programming approaches if and when you decide to [build your own packages](https://github.com/PennBBL/FixelDB/tree/develop), in whatever language you want.
